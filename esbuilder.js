@@ -1,16 +1,23 @@
 /**
  * Builder script for esbuild
+ *
+ * -w to watch
+ * --minify to minify the code
  */
+const path = require("path");
 
-const esbuild = require("esbuild");
-
-const fsExtra = require("fs-extra");
+//
 const srcDir = "src/";
 const publicDir = "public/";
 const buildDir = "build/";
-const mainSourceFile = "src/main.ts";
+const mainFile = path.join(srcDir, "main.ts");
+//
+
+const esbuild = require("esbuild");
+const fsExtra = require("fs-extra");
 
 const isWatching = process.argv.includes("-w");
+const wantMinified = process.argv.includes("--minify");
 
 function build() {
   // This if block may not be necessary.
@@ -22,12 +29,13 @@ function build() {
   // bundle typescript code
   esbuild
     .build({
-      entryPoints: [mainSourceFile],
+      entryPoints: [mainFile],
       loader: {
         ".ts": "ts",
       },
       bundle: true,
-      outfile: buildDir + "bundle.js",
+      minify: wantMinified,
+      outfile: path.join(buildDir, "bundle.js"),
       format: "esm",
     })
     .then((result) => {

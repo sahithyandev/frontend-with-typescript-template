@@ -6,8 +6,8 @@ function sayHi() {
 
 sayHi();
 
+let i = 0;
 document.body.onload = () => {
-  let i = 0;
   setInterval(() => {
     i++;
     document.querySelector(".counter--seconds").innerHTML = i.toString();
