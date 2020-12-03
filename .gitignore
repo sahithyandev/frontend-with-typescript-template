@@ -1,1 +1,4 @@
 node_modules
+
+# You shouldn't include the build folder in your git repo.
+# build
