@@ -1,16 +1,15 @@
 import { log } from "./utl";
 
-let x = Math.random();
-
-x++;
-log(x);
-
-const add = (a: number, b: number): number => {
-  return a + b;
-};
-
-function hi() {
-  log("joi");
+function sayHi() {
+  log("hi there?!");
 }
 
-log(document);
+sayHi();
+
+document.body.onload = () => {
+  let i = 0;
+  setInterval(() => {
+    i++;
+    document.querySelector(".counter--seconds").innerHTML = i.toString();
+  }, 1000);
+};

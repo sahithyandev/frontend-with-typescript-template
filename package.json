@@ -12,7 +12,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "node esbuilder.js"
+    "build": "node esbuilder.js",
+    "start": "node esbuilder.js -w"
   },
   "devDependencies": {
     "esbuild": "^0.8.17",

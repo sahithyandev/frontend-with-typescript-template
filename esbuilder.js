@@ -4,31 +4,60 @@
 
 const esbuild = require("esbuild");
 
-const publicDir = "public";
+const fsExtra = require("fs-extra");
+const srcDir = "src/";
+const publicDir = "public/";
 const buildDir = "build/";
 const mainSourceFile = "src/main.ts";
 
-// bundle typescript code
-esbuild
-  .build({
-    entryPoints: [mainSourceFile],
-    loader: {
-      ".ts": "ts",
-    },
-    bundle: true,
-    outfile: buildDir + "bundle.js",
-    format: "esm",
-  })
-  .then((result) => {
-    // on buildFinish
+const isWatching = process.argv.includes("-w");
 
-    // copy "public" to "build" directory
-    const fsExtra = require("fs-extra");
-    fsExtra.copySync(publicDir, buildDir);
+function build() {
+  // This if block may not be necessary.
+  // Removing it won't affect anything.
+  if (fsExtra.existsSync("build")) {
+    fsExtra.removeSync("build");
+  }
 
-    if (result.warnings && result.warnings.length !== 0) {
-      // result.warnings.forEach(console.warn);
-    }
+  // bundle typescript code
+  esbuild
+    .build({
+      entryPoints: [mainSourceFile],
+      loader: {
+        ".ts": "ts",
+      },
+      bundle: true,
+      outfile: buildDir + "bundle.js",
+      format: "esm",
+    })
+    .then((result) => {
+      // on buildFinish
 
-    console.log("Build Finished");
+      // copy "public" to "build" directory
+      fsExtra.copySync(publicDir, buildDir);
+
+      if (result.warnings && result.warnings.length !== 0) {
+        result.warnings.forEach(console.warn);
+      }
+
+      console.log("Build Finished");
+      if (isWatching) console.log("Watching for changes...");
+    });
+}
+
+build();
+if (isWatching) {
+  let fsTimeout;
+  const watchDirs = [srcDir, publicDir];
+  watchDirs.forEach((dirName) => {
+    fsExtra.watch(dirName, (event, fileName) => {
+      if (!fsTimeout) {
+        console.log(`Changes detected in ${dirName}`);
+        fsTimeout = setTimeout(function () {
+          fsTimeout = null;
+        }, 100);
+        build();
+      }
+    });
   });
+}
